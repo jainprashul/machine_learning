@@ -35,8 +35,8 @@ df.dropna(inplace = True)
 # defining datasets
 X = np.array(df.drop(['label'],1))
 X = preprocessing.scale(X) 
-x = X[: -forecast_out ]
 X_lately = X[-forecast_out:]
+x = X[: -forecast_out ]
 
 df.dropna(inplace=True)
 y = np.array(df['label'])
