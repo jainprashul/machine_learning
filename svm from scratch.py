@@ -42,7 +42,7 @@ class Support_Vector_Machine:
 
         # extemely expensive
         b_range_multiple = 5
-        #
+        # we dont need to take small steps with b as we do with w
         b_multiple = 5
         # greatest w initalize curve edges
         latest_optimum = self.max_feature_value*10
@@ -52,14 +52,41 @@ class Support_Vector_Machine:
             # we do this as it is convex
             optimized = False
             while not optimized:
-                pass
+                for b in np.arange(-1*(self.max_feature_value*b_range_multiple),
+                        self.max_feature_value*b_range_multiple,
+                        step*b_multiple):
+                    # multiplt by 4 transformations
+                    for tranformation in tranforms:
+                        w_t = w*tranformation
+                        found_option = True
+                        # weakest link in the SVM fundamentally
+                        # SMO attempts to fix this a bit
+                        # i is class
+                        # yi (xi.w + b) >= 1
+                        # add a break here later
+                        for i in self.data:
+                            for xi in self.data[i]:
+                                yi = 1
+                                if not yi*(np.dot(w_t, xi) + b) >= 1:
+                                    # here if one of transformation does not fit condition ignore
+                                    found_option = False
+                        
+                        if found_option:
+                            opt_dict[np.linalg.norm(w_t)] = [w_t,b]
+                if w[0] < 0:
+                    optimized = True
+                    print('Optimized a step')
+                else:
+                    w = w - step
+            
+            norms = sorted(n for n in opt_dict)
+            # ||w|| : [w,b]
+            opt_choice = opt_dict[norms[0]]
+            self.w = opt_choice[0]
+            self.b = opt_choice[1]
+            latest_optimum = opt_choice[0][0] + step * 2
 
 
-
-
-
-
-    
     def predict(self, features):
         # sign(x.w+b)
         classification = np.sign(np.dot(np.array(features), self.w)+ self.b)
