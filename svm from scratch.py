@@ -71,6 +71,7 @@ class Support_Vector_Machine:
                                 if not yi*(np.dot(w_t, xi) + b) >= 1:
                                     # here if one of transformation does not fit condition ignore
                                     found_option = False
+                                break
                         
                         if found_option:
                             opt_dict[np.linalg.norm(w_t)] = [w_t,b]
@@ -89,15 +90,19 @@ class Support_Vector_Machine:
 
 
     def predict(self, features):
+        #classification is just:
         # sign(x.w+b)
         classification = np.sign(np.dot(np.array(features), self.w)+ self.b)
-
+        # if the classification isn't zero, and we have visualization on, we graph
         if classification != 0 and self.visualization:
             self.ax.scatter(features[0], features[1], s=200, marker='*', c=self.colors[classification])
+        else:
+            print('featureset',features,'is on the decision boundary')
         return classification
 
     def visualize(self):
-        [[self.ax.scatter(x[0], x[1], color=self.colors[i]) for x in data_dict[i]] for i in data_dict] 
+        #scattering known featuresets.
+        [[self.ax.scatter(x[0], x[1],s=100, color=self.colors[i]) for x in data_dict[i]] for i in data_dict] 
 
         # hyperplane = x.w +b
         # v = x.w+b
@@ -115,20 +120,20 @@ class Support_Vector_Machine:
         # positive support vector hyperplane
         psv1 = hyperplane(hyp_x_min,self.w, self.b, 1)
         psv2 = hyperplane(hyp_x_max,self.w, self.b, 1)
-        self.ax.plot([hyp_x_min,hyp_x_max],[psv1,psv2])
-        print(hyp_x_min, hyp_x_max)
+        self.ax.plot([hyp_x_min,hyp_x_max],[psv1,psv2], 'k')
+        # print(hyp_x_min, hyp_x_max)
         
         # (w.x+b) = -1
         # negative support vector hyperplane
         nsv1 = hyperplane(hyp_x_min,self.w, self.b, -1)
         nsv2 = hyperplane(hyp_x_max,self.w, self.b, -1)
-        self.ax.plot([hyp_x_min,hyp_x_max],[nsv1,nsv2])
+        self.ax.plot([hyp_x_min,hyp_x_max],[nsv1,nsv2], 'k')
         
          # (w.x+b) = 0
-        # positive support vector hyperplane
+        # decision support vector hyperplane
         db1 = hyperplane(hyp_x_min,self.w, self.b, 0)
         db2 = hyperplane(hyp_x_max,self.w, self.b, 0)
-        self.ax.plot([hyp_x_min,hyp_x_max],[db1,db2])
+        self.ax.plot([hyp_x_min,hyp_x_max],[db1,db2], 'g--')
 
         plt.show()
 
